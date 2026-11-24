@@ -56,6 +56,24 @@ Two things the benchmark already shows:
 - Honest servers talk to the model too. The official fetch server's description says the model's earlier instruction to refuse no longer applies. That's override wording, written with good intent, and a scanner that flags it is noisy.
 - Text hides everywhere. Three tools from the official time server carry 82 pieces of model-visible text, mostly enum values in the schemas.
 
+## Results so far (dev split only)
+
+Rules v1, after tuning on the dev split:
+
+| | Caught | False alarms |
+|---|---|---|
+| Poisoned (33) | 33 | 0 of 97 benign |
+| Risky capability (12) | 12 | 0 |
+| Squatting (4) | 3 | 0 |
+
+These are **not the result**. Every rule was written and tuned while looking at these items, so they say the rules fit the cases they were built from, nothing more. Before tuning, v1 caught 31 of 33 with one false alarm. The [git log](https://github.com/AnoushahWasif/mcp-security-scanner/commits/main) shows each fix and why. The test split (453 items nobody has labelled yet) is scored once, after the rules are frozen.
+
+What tuning taught:
+- **`GET_ENV_INCLUDE_SECRETS` isn't "include secrets".** Underscores read as spaces only in *names*, where `ignore_previous_instructions` really is a sentence.
+- **Mention vs use:** "examples such as 'ignore previous instructions'" teaches; it doesn't attack. A phrase is excused only when it's quoted *and* introduced as an example. Quoting alone doesn't hide it.
+- **`b.log` doesn't end a sentence.** One missed attack hid behind a file extension.
+- **The one miss** is a fake server whose tool copies the real one exactly. Nothing in the tool's text gives it away; catching it needs package metadata (day 7).
+
 ## Architecture
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
