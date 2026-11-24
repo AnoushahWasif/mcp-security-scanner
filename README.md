@@ -21,6 +21,22 @@ uv sync
 make lint test
 ```
 
+## Usage so far
+
+```bash
+# What a saved listing or a client config contains (secrets come out redacted)
+uv run mcpscan inventory ~/Library/Application\ Support/Claude/claude_desktop_config.json tools.json
+
+# List a server's tools, prompts and resources inside Docker: no network, read-only, non-root.
+# The image must already contain the server. Only initialize and the list methods are sent.
+uv run mcpscan capture --name github --image ghcr.io/github/github-mcp-server -o github.json -- stdio
+
+# For a server you already trust, without Docker
+uv run mcpscan capture --name time --no-sandbox -o time.json -- uvx mcp-server-time
+```
+
+The official `mcp-server-time` server, captured this way, gives 3 tools and 82 separate pieces of text a model will read. Most are timezone names inside the input schemas. That's why the scanner looks at whole schemas, not just descriptions.
+
 ## Architecture
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
