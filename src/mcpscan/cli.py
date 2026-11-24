@@ -104,6 +104,11 @@ def print_text(report: dict) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # Tool text can be in any script. A console that can't show a character (cp1252 on
+    # Windows) gets an escape code instead of a crash halfway through the report.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(errors="backslashreplace")
     parser = argparse.ArgumentParser(
         prog="mcpscan", description="Scan MCP servers and client configs for security problems."
     )
