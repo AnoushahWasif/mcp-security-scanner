@@ -125,3 +125,17 @@ def test_load_config_caps_and_encoding(tmp_path, monkeypatch):
     path.write_text(json.dumps(CLAUDE_DESKTOP))
     with pytest.raises(CollectError, match="cap"):
         configs.load_config(path)
+
+
+def test_every_env_value_is_redacted_but_only_secrets_are_reported():
+    env = {
+        "LOG_LEVEL": "debug",
+        "PORT": "8080",
+        "STRIPE_KEY": "rk_live_short",
+        "DB_PASSWORD": "pw",
+        "RANDOM_LOOKING": "q8Zr2LmV9xKp4TnW7bYc3HdJ6sFg",
+    }
+    text = json.dumps({"mcpServers": {"x": {"command": "a", "env": env}}})
+    [server] = configs.parse_config(text)
+    assert all(v.startswith("<redacted") for v in server.env.values())
+    assert set(server.secrets) == {"env.STRIPE_KEY", "env.DB_PASSWORD", "env.RANDOM_LOOKING"}

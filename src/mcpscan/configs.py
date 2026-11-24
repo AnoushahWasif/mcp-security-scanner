@@ -10,6 +10,7 @@ report "plain-text token in env.GITHUB_TOKEN" without ever holding the token.
 """
 
 import json
+import math
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -23,12 +24,33 @@ TOKEN_SHAPES = re.compile(
     r"(?:ghp_|gho_|ghs_|github_pat_|glpat-|sk-ant-|sk-|xox[abpr]-|AIza|AKIA[0-9A-Z]{16}"
     r"|eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.)"
 )
-SECRET_WORDS = re.compile(r"token|secret|passw|api[-_]?key|apikey|auth|credential", re.I)
+SECRET_WORDS = re.compile(
+    r"token|secret|passw|api[-_]?key|apikey|auth|credential|private|(?:^|[_-])key(?:$|[_-])", re.I
+)
 SECRET_QUERY = re.compile(r"([?&](?:[^=&]*(?:token|key|secret|sig|auth)[^=&]*)=)[^&#]*", re.I)
 
 
 def redacted(value: str) -> str:
     return f"<redacted {len(value)} chars>"
+
+
+def _entropy(value: str) -> float:
+    counts = {c: value.count(c) for c in set(value)}
+    return -sum(n / len(value) * math.log2(n / len(value)) for n in counts.values())
+
+
+def looks_secret(key: str, value: str) -> bool:
+    """Every env/header value is redacted anyway; this decides which ones get *reported*, so
+    LOG_LEVEL=debug isn't called a plain-text secret."""
+    if SECRET_WORDS.search(key) or TOKEN_SHAPES.search(value):
+        return True
+    return (
+        len(value) >= 24
+        and " " not in value
+        and any(c.isdigit() for c in value)
+        and any(c.isalpha() for c in value)
+        and _entropy(value) > 3.5
+    )
 
 
 @dataclass(frozen=True)
@@ -87,7 +109,8 @@ def _redact_map(values, prefix: str, secrets: list[str]) -> dict:
             out[key] = value
         else:
             out[key] = redacted(value)
-            secrets.append(f"{prefix}.{key}")
+            if looks_secret(str(key), value):
+                secrets.append(f"{prefix}.{key}")
     return out
 
 
