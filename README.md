@@ -24,6 +24,10 @@ make lint test
 ## Usage so far
 
 ```bash
+# Findings in saved listings or Python server source (exit 1 if anything is poisoned)
+uv run mcpscan scan github.json server.py
+uv sync --extra guard && uv run mcpscan scan github.json --guard   # add the model layer
+
 # What a saved listing or a client config contains (secrets come out redacted)
 uv run mcpscan inventory ~/Library/Application\ Support/Claude/claude_desktop_config.json tools.json
 
