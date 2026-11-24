@@ -56,5 +56,13 @@
     "split": "dev",
     "licence": "MIT (modelcontextprotocol/servers); tool definitions only",
     "listing": "data/clean/official-time.json"
+  },
+  {
+    "name": "awslabs",
+    "split": "test",
+    "licence": "Apache-2.0 (awslabs/mcp); fetched at this commit at run time",
+    "repo": "https://github.com/awslabs/mcp.git",
+    "commit": "8229626e60fdb799c99e48d9199184fd027b0064",
+    "files": "src/*/awslabs/*/server.py"
   }
 ]
