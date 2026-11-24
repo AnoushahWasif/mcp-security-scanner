@@ -8,6 +8,12 @@
     "files": "code/*.py"
   },
   {
+    "name": "handwritten",
+    "split": "dev",
+    "licence": "MIT (this repo)",
+    "listing": "data/handwritten.json"
+  },
+  {
     "name": "dvmcp",
     "split": "test",
     "licence": "none stated: fetched at this commit at run time, never copied into this repo",
