@@ -140,3 +140,9 @@ def test_pathological_backtracking_input_is_fast():
     start = time.monotonic()
     rules.scan([item(nasty)])
     assert time.monotonic() - start < 2
+
+
+def test_identifiers_in_prose_are_not_read_as_words():
+    text = "Returns env vars. Set GET_ENV_INCLUDE_SECRETS to 1 to show secrets and passwords."
+    assert "MCP-EXF-001" not in found(item(text, name="get_env"))
+    assert "MCP-INJ-001" in found(item("x", name="ignore_previous_instructions"))

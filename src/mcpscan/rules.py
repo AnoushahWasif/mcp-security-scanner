@@ -51,11 +51,21 @@ def _invisible(c: str) -> bool:
     )
 
 
-def normalise(text: str) -> str:
-    """What the rules read: NFKC, invisible characters dropped, _ and - as spaces, lower case."""
+def normalise(text: str, is_name: bool = False) -> str:
+    """What the rules read: NFKC, invisible characters dropped, lower case.
+
+    In a name, _ and - become spaces, so `ignore_previous_instructions` reads as the phrase it
+    is. In prose they're kept: `GET_ENV_INCLUDE_SECRETS` is an identifier, not "include secrets".
+    """
     text = unicodedata.normalize("NFKC", text[:MAX_TEXT])
     text = "".join(c for c in text if not _invisible(c) and c != "\x1b")
-    return re.sub(r"[_\-]+", " ", text).lower()
+    if is_name:
+        text = re.sub(r"[_\-]+", " ", text)
+    return text.lower()
+
+
+def _is_name(text: Text) -> bool:
+    return text.where == "name" or text.where.endswith("#name")
 
 
 # --- hidden text ------------------------------------------------------------------------------
@@ -181,7 +191,7 @@ def _intent(norm: str) -> list[tuple[str, str, str]]:
 
 
 def intent(text: Text):
-    norm = normalise(text.value)
+    norm = normalise(text.value, _is_name(text))
     for rule, severity, message in _intent(norm):
         yield rule, severity, message, text.value
 
@@ -244,7 +254,9 @@ SAFE_CREDENTIAL_WORDING = re.compile(r"never (the )?values|names \(never|never r
 
 def risky(item: Item):
     texts = " . ".join(
-        normalise(t.value) for t in item.texts if t.where in {"name", "description", "title"}
+        normalise(t.value, _is_name(t))
+        for t in item.texts
+        if t.where in {"name", "description", "title"}
     )
     for rule, message, pattern in RISKY_RES:
         if pattern.search(texts):
