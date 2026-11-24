@@ -1,0 +1,68 @@
+[
+  {
+    "name": "mcpsecbench",
+    "split": "dev",
+    "licence": "MIT (AIS2Lab/MCPSecBench)",
+    "repo": "https://github.com/AIS2Lab/MCPSecBench.git",
+    "commit": "7612c5a3e811dcf01f64e4f2bb324591a2feaaf4",
+    "files": "code/*.py"
+  },
+  {
+    "name": "handwritten",
+    "split": "dev",
+    "licence": "MIT (this repo)",
+    "listing": "data/handwritten.json"
+  },
+  {
+    "name": "dvmcp",
+    "split": "test",
+    "licence": "none stated: fetched at this commit at run time, never copied into this repo",
+    "repo": "https://github.com/harishsg993010/damn-vulnerable-MCP-server.git",
+    "commit": "cdc4c6b5b76353203effcb26058e50fa6067d3a6",
+    "files": "challenges/*/*/server.py"
+  },
+  {
+    "name": "official-everything",
+    "split": "dev",
+    "licence": "MIT (modelcontextprotocol/servers); tool definitions only",
+    "listing": "data/clean/official-everything.json"
+  },
+  {
+    "name": "official-fetch",
+    "split": "dev",
+    "licence": "MIT (modelcontextprotocol/servers); tool definitions only",
+    "listing": "data/clean/official-fetch.json"
+  },
+  {
+    "name": "official-git",
+    "split": "dev",
+    "licence": "MIT (modelcontextprotocol/servers); tool definitions only",
+    "listing": "data/clean/official-git.json"
+  },
+  {
+    "name": "official-memory",
+    "split": "dev",
+    "licence": "MIT (modelcontextprotocol/servers); tool definitions only",
+    "listing": "data/clean/official-memory.json"
+  },
+  {
+    "name": "official-sequentialthinking",
+    "split": "dev",
+    "licence": "MIT (modelcontextprotocol/servers); tool definitions only",
+    "listing": "data/clean/official-sequentialthinking.json"
+  },
+  {
+    "name": "official-time",
+    "split": "dev",
+    "licence": "MIT (modelcontextprotocol/servers); tool definitions only",
+    "listing": "data/clean/official-time.json"
+  },
+  {
+    "name": "awslabs",
+    "split": "test",
+    "licence": "Apache-2.0 (awslabs/mcp); fetched at this commit at run time",
+    "repo": "https://github.com/awslabs/mcp.git",
+    "commit": "8229626e60fdb799c99e48d9199184fd027b0064",
+    "files": "src/*/awslabs/*/server.py"
+  }
+]

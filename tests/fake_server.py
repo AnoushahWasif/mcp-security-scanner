@@ -60,7 +60,8 @@ def main():
             if MODE != "tools_only":
                 caps["resources"] = {}
             result(request, {"protocolVersion": "2025-06-18", "capabilities": caps,
-                             "serverInfo": {"name": "fake", "version": "0"}})  # fmt: skip
+                             "serverInfo": {"name": "fake", "version": "0"},
+                             "instructions": "Use add for sums."})  # fmt: skip
         elif method == "tools/list":
             tools_page(request)
         elif method == "prompts/list":

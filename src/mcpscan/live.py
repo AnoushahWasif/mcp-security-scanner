@@ -13,6 +13,7 @@ import contextlib
 import json
 import queue
 import re
+import shutil
 import subprocess
 import threading
 import time
@@ -64,6 +65,8 @@ def sandbox_argv(image: str, command: list[str], docker: str = "docker") -> list
 class _Session:
     def __init__(self, argv: list[str], timeout: float):
         self.deadline = time.monotonic() + timeout
+        # On Windows, npx and similar are .cmd files that Popen won't find by bare name.
+        argv = [shutil.which(argv[0]) or argv[0], *argv[1:]]
         self.proc = subprocess.Popen(  # an argv list, never a shell
             argv,
             stdin=subprocess.PIPE,
@@ -218,6 +221,9 @@ def capture(argv: list[str], server: str, timeout: float = TIMEOUT_SECONDS) -> d
             else {},
             "protocolVersion": str(init.get("protocolVersion", "")),
         }
+        if isinstance(init.get("instructions"), str):
+            # Clients put these into the model's context: the most direct place to poison.
+            out["instructions"] = init["instructions"]
         for capability, methods in LISTS.items():
             if capability in capabilities:
                 for method, key in methods:

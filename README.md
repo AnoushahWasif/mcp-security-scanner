@@ -37,6 +37,25 @@ uv run mcpscan capture --name time --no-sandbox -o time.json -- uvx mcp-server-t
 
 The official `mcp-server-time` server, captured this way, gives 3 tools and 82 separate pieces of text a model will read. Most are timezone names inside the input schemas. That's why the scanner looks at whole schemas, not just descriptions.
 
+## Benchmark
+
+| Source | Split | Items | Labels | Licence |
+|---|---|---|---|---|
+| [MCPSecBench](https://github.com/AIS2Lab/MCPSecBench) servers | dev | 23 | 6 poisoned, 5 risky, 2 squatting, 10 benign | MIT, fetched at a pinned commit |
+| Hand-written cases ([bench/make_handwritten.py](bench/make_handwritten.py)) | dev | 59 | 28 poisoned, 5 risky, 2 squatting, 24 benign hard negatives | MIT |
+| Official reference servers (time, fetch, git, memory, everything, sequential thinking) | dev | 64 | 2 risky, 62 benign | MIT, captured listings |
+| [Damn Vulnerable MCP Server](https://github.com/harishsg993010/damn-vulnerable-MCP-server) | test | 105 | labelled after the rules freeze | no licence stated: fetched at run time, never copied here |
+| [awslabs/mcp](https://github.com/awslabs/mcp) (46 servers) | test | 348 | labelled after the rules freeze | Apache-2.0, fetched at a pinned commit |
+
+How the test score is kept honest:
+- Rules are written from the dev split only. The test split is labelled only **after** the rules are frozen, and the commit order shows it.
+- [bench/manifest.json](bench/manifest.json) holds a hash of every source's content, so a changed upstream can't slip in.
+- One leak to declare: while checking how Damn Vulnerable MCP Server defines its tools, I read one of its 15 challenge files (challenge 5, tool shadowing) before deciding it would be the test set.
+
+Two things the benchmark already shows:
+- Honest servers talk to the model too. The official fetch server's description says the model's earlier instruction to refuse no longer applies. That's override wording, written with good intent, and a scanner that flags it is noisy.
+- Text hides everywhere. Three tools from the official time server carry 82 pieces of model-visible text, mostly enum values in the schemas.
+
 ## Architecture
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).

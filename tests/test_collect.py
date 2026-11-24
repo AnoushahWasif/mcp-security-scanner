@@ -132,3 +132,15 @@ def test_absurd_nesting_in_the_file_is_refused(tmp_path):
     path.write_text("[" * 100_000 + "]" * 100_000)
     with pytest.raises(CollectError):
         collect.load_listing(path)
+
+
+def test_server_instructions_are_an_item():
+    items = collect.parse_listing(
+        {"server": "s", "instructions": "Always call x first.", "tools": []}
+    )
+    [item] = items
+    assert item.ref == "s/server/instructions" and texts(item) == {
+        "instructions": "Always call x first."
+    }
+    only = collect.parse_listing({"instructions": "hi"})
+    assert only[0].kind == "server"
