@@ -98,3 +98,14 @@ def test_only_initialize_and_list_methods_are_ever_sent(monkeypatch):
         "resources/list",
         "resources/templates/list",
     }
+
+
+def test_the_command_is_resolved_on_path(monkeypatch):
+    real_which = live.shutil.which
+    monkeypatch.setattr(
+        live.shutil,
+        "which",
+        lambda name: sys.executable if name == "npx-like" else real_which(name),
+    )
+    out = live.capture(["npx-like", FAKE, "ok"], server="fake")
+    assert len(out["tools"]) == 2
