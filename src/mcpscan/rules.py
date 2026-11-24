@@ -284,8 +284,12 @@ RISKY_PATTERNS = [
      r"|internal (system )?credentials|credential (store|vault) contents"),
 ]  # fmt: skip
 RISKY_RES = [(rule, msg, re.compile(p)) for rule, msg, p in RISKY_PATTERNS]
-SAFE_CREDENTIAL_WORDING = re.compile(r"never (the )?values|names \(never|never returned|"
-                                     r"present or missing|checked locally|redacted")  # fmt: skip
+# Wording that says secret values never come back. "Redacted" only excuses the credentials
+# rule: a tool that returns every environment variable is still risky with a few masked.
+SAFE_WORDING = {
+    "MCP-CAP-004": re.compile(r"never (the )?values|present or missing|never returned"),
+    "MCP-CAP-005": re.compile(r"never (the )?values|names \(never|never returned|redacted"),
+}
 
 
 def risky(item: Item):
@@ -296,7 +300,7 @@ def risky(item: Item):
     )
     for rule, message, pattern in RISKY_RES:
         if pattern.search(texts):
-            if rule in {"MCP-CAP-004", "MCP-CAP-005"} and SAFE_CREDENTIAL_WORDING.search(texts):
+            if rule in SAFE_WORDING and SAFE_WORDING[rule].search(texts):
                 continue
             yield Finding(rule, RISKY, "low", item.ref, "description", message, evidence(texts))
 
