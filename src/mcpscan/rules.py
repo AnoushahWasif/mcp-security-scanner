@@ -208,6 +208,22 @@ def _intent(norm: str) -> list[tuple[str, str, str]]:
     return hits
 
 
+LABEL_INSTRUCTION = re.compile(
+    r"\b(important|always|must|never|ignore|do not|don't)\b|\b(call|run|use|read|send) "
+    r"[a-z0-9_ -]{1,30} (first|before)|\bbefore (using|calling|answering)\b"
+)
+
+
+def _is_label(text: Text) -> bool:
+    return text.where in {"title", "annotations.title"} or text.where.endswith(".title")
+
+
+def label_instruction(text: Text):
+    """Titles are labels a person skims, not prose: an instruction there is out of place."""
+    if _is_label(text) and LABEL_INSTRUCTION.search(normalise(text.value)):
+        yield "MCP-INJ-003", "medium", "an instruction inside a title or label field", text.value
+
+
 def intent(text: Text):
     norm = normalise(text.value, _is_name(text))
     for rule, severity, message in _intent(norm):
@@ -321,7 +337,7 @@ def squatting(items: list[Item]):
 
 # --- running ----------------------------------------------------------------------------------
 
-TEXT_RULES = (hidden_text, hidden_markup, intent)
+TEXT_RULES = (hidden_text, hidden_markup, intent, label_instruction)
 
 
 def scan_item(item: Item) -> list[Finding]:
