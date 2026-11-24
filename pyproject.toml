@@ -33,6 +33,7 @@ select = ["E", "F", "I", "B", "UP", "SIM"]
 [tool.ruff.lint.per-file-ignores]
 # Embedded server source as test input: its long lines are the input, not our style.
 "tests/test_extract.py" = ["E501"]
+"bench/make_handwritten.py" = ["E501"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
