@@ -1,0 +1,52 @@
+{
+  "mcpsecbench": {
+    "split": "dev",
+    "items": 23,
+    "sha256": "104437571f4cc230a47758ff424f19e9d7cabc2e98e17f53d20b9054004c2636"
+  },
+  "handwritten": {
+    "split": "dev",
+    "items": 59,
+    "sha256": "f4ca7704b9a48965fcf6f718a97ed239eba2f6dfeed24c70fc8628a22063a9b2"
+  },
+  "dvmcp": {
+    "split": "test",
+    "items": 105,
+    "sha256": "4a4a546f0f375b9189c70b2602ec039bc94ff1323c79835f08c8622a66f69f95"
+  },
+  "official-everything": {
+    "split": "dev",
+    "items": 32,
+    "sha256": "5ca203f61a606e9b360b840c93fadc5e8b31f37611aa3e31ece9f59a3ce82755"
+  },
+  "official-fetch": {
+    "split": "dev",
+    "items": 2,
+    "sha256": "779b0e6baf132e9134476260dfeff8d0ef2401433ab249cc2ed6decb4c936c73"
+  },
+  "official-git": {
+    "split": "dev",
+    "items": 16,
+    "sha256": "e5a938cc0cbcfa23e9871cab593aaed7c4567d7dd69805e6995c4d598e9bc54d"
+  },
+  "official-memory": {
+    "split": "dev",
+    "items": 10,
+    "sha256": "99a820ae599f47930710dfb247f88b1b109885ac364a899735d89a3651ea5fd8"
+  },
+  "official-sequentialthinking": {
+    "split": "dev",
+    "items": 1,
+    "sha256": "be4860779027f14f170b0a0f01931cfd99dec23ad6a0d73ff34edc2e278882e4"
+  },
+  "official-time": {
+    "split": "dev",
+    "items": 3,
+    "sha256": "62c215c75844bbde84c34f0814cd559fe86f1636fbea9f963e8bee6de7f29077"
+  },
+  "awslabs": {
+    "split": "test",
+    "items": 348,
+    "sha256": "60a1701ede04d7f098b86f2ab0a73fca128c3b6bac9d3ac925af955220143171"
+  }
+}
