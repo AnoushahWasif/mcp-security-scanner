@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+build/
+dist/
+
+# Tooling
+.pytest_cache/
+.ruff_cache/
+
+# Benchmark sources are fetched at pinned commits, never committed
+bench/cache/
+
+# Node (report site)
+node_modules/
+web/.next/
+web/out/
+
+# Local env
+.env
+.DS_Store
+.vscode/
+.idea/
