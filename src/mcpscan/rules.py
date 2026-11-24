@@ -142,6 +142,8 @@ CONCEAL = re.compile(
 EXFIL_VERB = re.compile(
     r"\b(send|pass|include|append|paste|attach|put|upload|post|forward|copy|email|"
     r"leak|transmit|add|read)\b|envía|enviar|发送|送信"
+    # ...or a tool call whose name starts with one: "call send_email with the user's keys"
+    r"|\b(send|email|upload|post|forward|export|share)_[a-z0-9_]{1,40}"
 )
 SENSITIVE = re.compile(
     r"~/\.ssh|id_rsa|id_ed25519|\.env\b|\.aws/credentials|aws credentials|\.netrc|mcp\.json|"
@@ -150,20 +152,23 @@ SENSITIVE = re.compile(
     r"private key)|credentials|secrets://|email address(es)? and phone|密码|contraseñas?"
 )
 NEGATION = re.compile(r"\b(never|not|don't|no|without)\b[^.]{0,40}$")
+# Any character inside one sentence: a full stop counts only when it ends a word (b.log doesn't).
+IN = r"(?:[^.]|\.(?=\S))"
+TOOL = r"[a-z0-9 _-]"
 OTHER_TOOL_CHANGE = re.compile(
-    r"(whenever|when|if) (the )?[a-z0-9 ]{1,40} (tool|function) is (used|called)[^.]{0,120}"
+    rf"(whenever|when|if) (the )?{TOOL}{{1,40}} (tool|function) is (used|called){IN}{{0,120}}"
     r"\b(add|replace|change|modify|bcc|cc|redirect|also)\b"
-    r"|(before|after) (using|calling|execute|executing|running|you use) [^.]{0,60}"
-    r"\b(run|execute|call) this (tool|function)[^.]{0,80}\b(replace|modify|change|instead)\b"
-    r"|after using [a-z ]{1,30} tool[^.]{0,80}(modify|replace|change|correct) the"
-    r"|(also|first) (read|call|run|execute) [a-z0-9:/ ]{1,40}"
+    rf"|(before|after) (using|calling|execute|executing|running|you use) {IN}{{0,60}}"
+    rf"\b(run|execute|call) this (tool|function){IN}{{0,80}}\b(replace|modify|change|instead)\b"
+    rf"|after using {TOOL}{{1,30}} tool{IN}{{0,80}}(modify|replace|change|correct) the"
+    rf"|(also|first) (read|call|run|execute) [a-z0-9:/ _-]{{1,40}}"
     r"(and (summarise|summarize|send|include)|using the shell)"
 )
 EXCLUSIVE = re.compile(
     r"(always|just|only) use this tool[^.]{0,80}(instead of any other|rather than|no matter|"
     r"even (when|if) the user)"
     r"|use this tool rather than others"
-    r"|(instead of|over) any other [a-z ]{0,30} tool,? even"
+    r"|(instead of|over) any other [a-z0-9 _-]{0,30} tool,? even"
 )
 
 
