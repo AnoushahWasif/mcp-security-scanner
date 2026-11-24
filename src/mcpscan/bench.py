@@ -15,8 +15,10 @@ Labels per item:
 - benign: none of the above
 """
 
+import hashlib
 import json
 import subprocess
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -114,3 +116,45 @@ def check_coverage(items: list[Item], labels: dict[str, dict]) -> None:
     stale = sorted(set(labels) - refs)
     if missing or stale:
         raise BenchError(f"unlabelled: {missing[:5]} ({len(missing)} in all), stale: {stale[:5]}")
+
+
+def fingerprint(items: list[Item]) -> dict:
+    """Count and one hash over every item's definition hash: any change to any item shows."""
+    digest = hashlib.sha256()
+    for ref, sha in sorted((i.ref, i.sha256) for i in items):
+        digest.update(f"{ref}\t{sha}\n".encode())
+    return {"items": len(items), "sha256": digest.hexdigest()}
+
+
+def build_manifest(sources: list[Source], cache: Path = CACHE) -> dict:
+    return {s.name: {"split": s.split, **fingerprint(items_of(s, cache))} for s in sources}
+
+
+def check_manifest(manifest: dict, expected: dict) -> list[str]:
+    """Sources whose content differs from what was frozen."""
+    problems = []
+    for name in sorted(set(manifest) | set(expected)):
+        if manifest.get(name) != expected.get(name):
+            problems.append(name)
+    return problems
+
+
+def main(argv: list[str] | None = None) -> int:
+
+    args = sys.argv[1:] if argv is None else argv
+    path = BENCH / "manifest.json"
+    manifest = build_manifest(load_sources())
+    if args == ["freeze"]:
+        path.write_text(json.dumps(manifest, indent=2) + "\n")
+        print(json.dumps(manifest, indent=2))
+        return 0
+    changed = check_manifest(manifest, json.loads(path.read_text()))
+    if changed:
+        print(f"changed since frozen: {', '.join(changed)}")
+        return 1
+    print(f"{sum(m['items'] for m in manifest.values())} items in {len(manifest)} sources match")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

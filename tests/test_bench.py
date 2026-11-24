@@ -115,3 +115,24 @@ def test_coverage_finds_unlabelled_and_stale(upstream, tmp_path):
         bench.check_coverage(items, dict(list(labels.items())[:1]))
     with pytest.raises(BenchError, match="stale"):
         bench.check_coverage(items, {**labels, "gone/tool/x": {"label": "benign"}})
+
+
+def test_fingerprint_changes_with_any_item(upstream, tmp_path):
+    items = bench.items_of(upstream, cache=tmp_path / "cache")
+    first = bench.fingerprint(items)
+    assert first == bench.fingerprint(list(reversed(items)))  # order doesn't matter
+    assert first["items"] == 2
+    assert bench.fingerprint(items[:1])["sha256"] != first["sha256"]
+
+
+def test_check_manifest_names_changed_sources():
+    frozen = {
+        "a": {"split": "dev", "items": 1, "sha256": "x"},
+        "b": {"split": "test", "items": 2, "sha256": "y"},
+    }
+    now = {
+        "a": {"split": "dev", "items": 1, "sha256": "x"},
+        "b": {"split": "test", "items": 2, "sha256": "z"},
+    }
+    assert bench.check_manifest(now, frozen) == ["b"]
+    assert bench.check_manifest({**now, "c": {}}, frozen) == ["b", "c"]
