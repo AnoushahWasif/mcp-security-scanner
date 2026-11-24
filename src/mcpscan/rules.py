@@ -176,9 +176,22 @@ def _sentences(text: str):
     return re.split(r"(?<=[.!?。！？])\s+|\n+", text)
 
 
+EXAMPLE_CUE = re.compile(r"(such as|e\.g\.|for example|examples?|like|called|known as)\W{0,4}$")
+QUOTES = "'\"‘’“”"
+
+
+def _quoted_example(norm: str, match: re.Match) -> bool:
+    """`examples such as 'ignore previous instructions'` mentions the attack; it doesn't make it.
+    Both the quotes and the cue are needed, so quoting alone doesn't hide a real instruction."""
+    before, after = norm[: match.start()], norm[match.end() :]
+    quoted = before[-1:] in QUOTES and after[:1] in QUOTES
+    return quoted and bool(EXAMPLE_CUE.search(before[:-1].rstrip()))
+
+
 def _intent(norm: str) -> list[tuple[str, str, str]]:
     hits = []
-    if OVERRIDE.search(norm):
+    override = OVERRIDE.search(norm)
+    if override and not _quoted_example(norm, override):
         hits.append(("MCP-INJ-001", "high", "tries to override the model's instructions"))
     if CONCEAL.search(norm):
         hits.append(("MCP-INJ-002", "high", "tells the model to hide something from the user"))
