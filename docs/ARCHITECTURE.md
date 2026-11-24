@@ -113,6 +113,7 @@ flowchart LR
 4. **Benchmark split by source,** test scored once.
 5. **No AWS in v1.** The report is a static site. Hosting it on S3 + CloudFront (free tier) could be a later step, with a budget alarm.
 6. **Live scans only in Docker** and only `tools/list`; never call tools.
+7. **The guard model is off by default (day 5, decided on dev before the test split is opened).** The prompt-injection-guard model was trained on user prompts. On dev, alone it catches 7 of 33 poisoned items and flags 6 of 97 benign ones. It flags long, instruction-heavy honest descriptions, and misses poisoning that reads like documentation. Added to the rules, it catches nothing new and adds 6.2 false alarms per 100 benign items. It stays available behind `--guard`, and the test split reports both "rules" and "rules + guard", as declared here.
 
 ## Plan (about 10 days)
 

@@ -7,6 +7,10 @@ license = "MIT"
 requires-python = ">=3.12"
 dependencies = []
 
+[project.optional-dependencies]
+# The guard model layer (day 5). The base scanner needs nothing outside the standard library.
+guard = ["scikit-learn>=1.9.1", "numpy>=2.0", "safetensors>=0.4"]
+
 [project.scripts]
 mcpscan = "mcpscan.cli:main"
 
@@ -35,6 +39,8 @@ select = ["E", "F", "I", "B", "UP", "SIM"]
 "tests/test_extract.py" = ["E501"]
 "bench/make_handwritten.py" = ["E501"]
 "tests/test_rules.py" = ["E501"]
+"tests/test_guard.py" = ["E501"]
+"tests/test_cli.py" = ["E501"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
