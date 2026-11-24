@@ -278,12 +278,14 @@ RISKY_PATTERNS = [
      r"file (on|from) the filesystem by (absolute )?path|reads a file and"),
     ("MCP-CAP-003", "makes arbitrary network requests",
      r"\b(any|arbitrary) url|fetches a url from the internet|http request to any"),
-    ("MCP-CAP-004", "exposes credentials or environment variables",
-     r"environment variables?|\bcredentials\b|show credentials"),
+    ("MCP-CAP-004", "exposes environment variables", r"environment variables?"),
+    ("MCP-CAP-005", "returns credentials",
+     r"\b(return|show|list|expose|get|read|dump)s? (the |all |system |internal )?credentials"
+     r"|internal (system )?credentials|credential (store|vault) contents"),
 ]  # fmt: skip
 RISKY_RES = [(rule, msg, re.compile(p)) for rule, msg, p in RISKY_PATTERNS]
 SAFE_CREDENTIAL_WORDING = re.compile(r"never (the )?values|names \(never|never returned|"
-                                     r"present or missing|checked locally")  # fmt: skip
+                                     r"present or missing|checked locally|redacted")  # fmt: skip
 
 
 def risky(item: Item):
@@ -294,7 +296,7 @@ def risky(item: Item):
     )
     for rule, message, pattern in RISKY_RES:
         if pattern.search(texts):
-            if rule == "MCP-CAP-004" and SAFE_CREDENTIAL_WORDING.search(texts):
+            if rule in {"MCP-CAP-004", "MCP-CAP-005"} and SAFE_CREDENTIAL_WORDING.search(texts):
                 continue
             yield Finding(rule, RISKY, "low", item.ref, "description", message, evidence(texts))
 
@@ -308,8 +310,14 @@ WELL_KNOWN = {
 }  # fmt: skip
 
 
+def _canonical(name: str) -> str:
+    return name.lower().replace("-", "_")
+
+
 def _close(a: str, b: str) -> bool:
-    """One edit apart, or the same apart from a trailing s/underscore or a prefix."""
+    """One edit apart, or the same apart from a trailing s or underscore. Names that are
+    identical once - and _ are treated alike are duplicates, not look-alikes."""
+    a, b = _canonical(a), _canonical(b)
     if a == b:
         return False
     if a.rstrip("_s") == b.rstrip("_s"):
@@ -319,7 +327,16 @@ def _close(a: str, b: str) -> bool:
     short, long_ = sorted((a, b), key=len)
     if len(long_) - len(short) == 1:
         return any(long_[:i] + long_[i + 1 :] == short for i in range(len(long_)))
-    return long_.endswith("_" + short) and long_.split("_")[0] in {"github", "gh", "git", "fs"}
+    return False
+
+
+def _prefixed(name: str, known: str) -> bool:
+    """`github_create_pull_requests` dressing up as `create_pull_request`."""
+    name = _canonical(name)
+    head, _, rest = name.partition("_")
+    return head in {"github", "gh", "git", "fs", "official"} and (
+        rest == known or _close(rest, known)
+    )
 
 
 def squatting(items: list[Item]):
@@ -327,7 +344,7 @@ def squatting(items: list[Item]):
     tools = [i for i in items if i.kind == "tool"]
     for item in tools:
         name = item.name.lower()
-        near = {w for w in WELL_KNOWN if _close(name, w)}
+        near = {w for w in WELL_KNOWN if _close(name, w) or _prefixed(name, w)}
         near |= {o.name for o in tools if o.server != item.server and _close(name, o.name.lower())}
         if near and name not in WELL_KNOWN:
             yield Finding("MCP-SQT-001", SQUATTING, "medium", item.ref, "name",
