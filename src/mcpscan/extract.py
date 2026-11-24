@@ -160,6 +160,15 @@ def _tool_call(call: ast.Call) -> dict | None:
     return entry
 
 
+def _server_instructions(call: ast.Call) -> str | None:
+    """`FastMCP("name", instructions="...")` or `Server("name", instructions="...")`."""
+    name = call.func.attr if isinstance(call.func, ast.Attribute) else getattr(call.func, "id", "")
+    if name not in {"FastMCP", "Server", "MCPServer"}:
+        return None
+    value = _kwargs(call).get("instructions")
+    return _text(value) if value is not None else None
+
+
 def extract_source(source: str, server: str) -> dict:
     try:
         tree = ast.parse(source)
@@ -177,6 +186,9 @@ def extract_source(source: str, server: str) -> dict:
             entry = _tool_call(node)
             if entry:
                 out["tools"].append(entry)
+            instructions = _server_instructions(node)
+            if instructions:
+                out["instructions"] = instructions
     return out
 
 
