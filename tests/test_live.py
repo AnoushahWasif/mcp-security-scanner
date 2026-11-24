@@ -20,8 +20,9 @@ def test_captures_every_list_with_pagination():
     assert out["resources"][0]["uri"] == "mem://a"
     assert out["resourceTemplates"] == []  # optional list refused by the server: empty, not fatal
     assert out["serverInfo"] == {"name": "fake", "version": "0"}
+    assert out["instructions"] == "Use add for sums."
     items = collect.parse_listing(out)
-    assert {i.kind for i in items} == {"tool", "prompt", "resource"}
+    assert {i.kind for i in items} == {"server", "tool", "prompt", "resource"}
 
 
 def test_only_advertised_lists_are_asked_for():

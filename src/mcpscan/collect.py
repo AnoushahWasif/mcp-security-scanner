@@ -2,7 +2,7 @@
 will see from it.
 
 A listing is untrusted input written by whoever runs the server. Accepted shapes:
-- a capture written by `mcpscan capture` ({"server": ..., "tools": [...], "prompts": [...], ...})
+- a capture written by `mcpscan capture` ({"server": ..., "instructions": ..., "tools": [...], ...})
 - a bare `tools/list` result ({"tools": [...]}), optionally with prompts/resources
 - a JSON-RPC response wrapping either of the above ({"jsonrpc": "2.0", "result": {...}})
 
@@ -130,9 +130,16 @@ def parse_listing(data, server: str = "unknown") -> list[Item]:
         raise CollectError("a listing must be a JSON object")
     if isinstance(data.get("server"), str) and data["server"]:
         server = data["server"]
-    if not any(key in data for key in KINDS):
+    if not any(key in data for key in KINDS) and "instructions" not in data:
         raise CollectError(f"no {', '.join(KINDS)} in the listing")
     items: list[Item] = []
+    instructions = data.get("instructions")
+    if isinstance(instructions, str) and instructions:
+        definition = {"instructions": instructions}
+        texts = (Text("instructions", instructions),)
+        items.append(
+            Item(server, "server", "instructions", texts, definition, definition_hash(definition))
+        )
     for key, kind in KINDS.items():
         entries = data.get(key, [])
         if not isinstance(entries, list):

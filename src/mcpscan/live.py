@@ -221,6 +221,9 @@ def capture(argv: list[str], server: str, timeout: float = TIMEOUT_SECONDS) -> d
             else {},
             "protocolVersion": str(init.get("protocolVersion", "")),
         }
+        if isinstance(init.get("instructions"), str):
+            # Clients put these into the model's context: the most direct place to poison.
+            out["instructions"] = init["instructions"]
         for capability, methods in LISTS.items():
             if capability in capabilities:
                 for method, key in methods:
