@@ -20,5 +20,41 @@
     "repo": "https://github.com/harishsg993010/damn-vulnerable-MCP-server.git",
     "commit": "cdc4c6b5b76353203effcb26058e50fa6067d3a6",
     "files": "challenges/*/*/server.py"
+  },
+  {
+    "name": "official-everything",
+    "split": "dev",
+    "licence": "MIT (modelcontextprotocol/servers); tool definitions only",
+    "listing": "data/clean/official-everything.json"
+  },
+  {
+    "name": "official-fetch",
+    "split": "dev",
+    "licence": "MIT (modelcontextprotocol/servers); tool definitions only",
+    "listing": "data/clean/official-fetch.json"
+  },
+  {
+    "name": "official-git",
+    "split": "dev",
+    "licence": "MIT (modelcontextprotocol/servers); tool definitions only",
+    "listing": "data/clean/official-git.json"
+  },
+  {
+    "name": "official-memory",
+    "split": "dev",
+    "licence": "MIT (modelcontextprotocol/servers); tool definitions only",
+    "listing": "data/clean/official-memory.json"
+  },
+  {
+    "name": "official-sequentialthinking",
+    "split": "dev",
+    "licence": "MIT (modelcontextprotocol/servers); tool definitions only",
+    "listing": "data/clean/official-sequentialthinking.json"
+  },
+  {
+    "name": "official-time",
+    "split": "dev",
+    "licence": "MIT (modelcontextprotocol/servers); tool definitions only",
+    "listing": "data/clean/official-time.json"
   }
 ]
