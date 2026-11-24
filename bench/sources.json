@@ -1,0 +1,18 @@
+[
+  {
+    "name": "mcpsecbench",
+    "split": "dev",
+    "licence": "MIT (AIS2Lab/MCPSecBench)",
+    "repo": "https://github.com/AIS2Lab/MCPSecBench.git",
+    "commit": "7612c5a3e811dcf01f64e4f2bb324591a2feaaf4",
+    "files": "code/*.py"
+  },
+  {
+    "name": "dvmcp",
+    "split": "test",
+    "licence": "none stated: fetched at this commit at run time, never copied into this repo",
+    "repo": "https://github.com/harishsg993010/damn-vulnerable-MCP-server.git",
+    "commit": "cdc4c6b5b76353203effcb26058e50fa6067d3a6",
+    "files": "challenges/*/*/server.py"
+  }
+]
